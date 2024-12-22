@@ -1,21 +1,23 @@
 {
-  "name": "@figma/rest-api-spec",
-  "version": "0.22.0",
-  "description": "Typings for the Figma REST API",
-  "main": "dist/api_types.ts",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/figma/rest-api-spec.git"
+  "name": "rest-api-spec-figma-austin",
+  "version": "1.0.0",
+  "description": "Figma API integration for fetching design data",
+  "main": "dist/fetchFigmaData.js",
+  "scripts": {
+    "build": "tsc",
+    "fetch": "npm run build && node dist/fetchFigmaData.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [
-    "figma",
-    "REST",
-    "typings"
-  ],
-  "author": "Figma",
-  "license": "MIT License",
-  "bugs": {
-    "url": "https://github.com/figma/rest-api-spec/issues"
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.6.2",
+    "dotenv": "^16.3.1"
   },
-  "homepage": "https://github.com/figma/rest-api-spec"
+  "devDependencies": {
+    "@types/axios": "^0.9.36",
+    "@types/node": "^20.10.5",
+    "typescript": "^5.3.3"
+  }
 }
