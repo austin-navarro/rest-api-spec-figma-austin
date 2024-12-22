@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      target: dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    environment:
+      - NODE_ENV=development
+      - NEXT_TELEMETRY_DISABLED=1
+    env_file:
+      - .env
+    develop:
+      watch:
+        - path: ./src
+          target: /app/src
+          action: sync
+        - path: ./package.json
+          action: rebuild
+        - path: ./package-lock.json
+          action: rebuild
+        - path: ./tsconfig.json
+          target: /app/tsconfig.json
+          action: sync
+        - path: ./next.config.js
+          target: /app/next.config.js
+          action: sync
+        - path: ./postcss.config.js
+          target: /app/postcss.config.js
+          action: sync
+        - path: ./tailwind.config.ts
+          target: /app/tailwind.config.ts
+          action: sync
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s

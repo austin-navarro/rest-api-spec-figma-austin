@@ -1,0 +1,25 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "NodeNext",
+    "target": "ESNext",
+    "lib": ["ESNext"],
+    "esModuleInterop": true,
+    "allowJs": true,
+    "strict": true,
+    "noEmit": true,
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "paths": {
+      "@/*": ["../src/*"]
+    }
+  },
+  "ts-node": {
+    "esm": true,
+    "experimentalSpecifiers": true
+  },
+  "include": ["./**/*.ts"],
+  "exclude": ["node_modules"]
+} 

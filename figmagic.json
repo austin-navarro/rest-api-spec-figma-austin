@@ -1,0 +1,31 @@
+{
+  "token": "${FIGMA_ACCESS_TOKEN}",
+  "fileId": "${FIGMA_FILE_ID}",
+  "outputFolderTokens": "src/tokens",
+  "outputFolderGraphics": "src/assets",
+  "outputFolderComponents": "src/components/figma",
+  "templates": {
+    "templatePathReact": "./templates/react.tsx",
+    "templatePathStorybook": "./templates/story.tsx"
+  },
+  "usePostscriptNames": false,
+  "useLiteralFontFamilies": true,
+  "syncElements": true,
+  "syncGraphics": true,
+  "syncTokens": true,
+  "tokenOutputFormat": "ts",
+  "recompileLocal": true,
+  "outputFormatTokens": "ts",
+  "outputFormatGraphics": "svg",
+  "outputFormatComponents": "tsx",
+  "outputScaleGraphics": 1,
+  "parseTokenNames": true,
+  "remSize": 16,
+  "skipFileGeneration": {
+    "skipReact": false,
+    "skipStorybook": false,
+    "skipStyled": true,
+    "skipCss": true,
+    "skipDescription": true
+  }
+} 
