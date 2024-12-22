@@ -1,20 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { COMPONENT_NAME } from './COMPONENT_NAME';
 
+// We'll add the component import when generating actual stories
 const meta = {
-  title: 'Components/COMPONENT_NAME',
-  component: COMPONENT_NAME,
-  parameters: {
-    layout: 'centered',
-  },
-  tags: ['autodocs'],
-} satisfies Meta<typeof COMPONENT_NAME>;
+  title: 'Example/Component',
+} satisfies Meta;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {
-  args: {
-    children: 'COMPONENT_NAME Content',
-  },
+export const Primary: Story = {
+  args: {},
 };

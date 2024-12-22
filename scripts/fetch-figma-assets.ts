@@ -35,74 +35,56 @@ interface FigmaFile {
   };
 }
 
-async function getFigmaFile(): Promise<FigmaFile> {
-  try {
-    const response = await fetch(`https://api.figma.com/v1/files/${FIGMA_FILE_ID}`, {
+interface FigmaImageResponse {
+  images: Record<string, string>;
+}
+
+const fetchFigmaFile = async (fileId: string): Promise<FigmaFile> => {
+  if (!process.env.FIGMA_ACCESS_TOKEN) {
+    throw new Error('FIGMA_ACCESS_TOKEN is required');
+  }
+
+  const response = await fetch(`https://api.figma.com/v1/files/${fileId}`, {
+    headers: {
+      'X-Figma-Token': process.env.FIGMA_ACCESS_TOKEN
+    }
+  });
+
+  const data = await response.json() as FigmaFile;
+  return data;
+};
+
+const fetchFigmaImages = async (fileId: string, nodeIds: string[]): Promise<Record<string, string>> => {
+  if (!process.env.FIGMA_ACCESS_TOKEN) {
+    throw new Error('FIGMA_ACCESS_TOKEN is required');
+  }
+
+  const response = await fetch(
+    `https://api.figma.com/v1/images/${fileId}?ids=${nodeIds.join(',')}`,
+    {
       headers: {
-        'X-Figma-Token': FIGMA_ACCESS_TOKEN
+        'X-Figma-Token': process.env.FIGMA_ACCESS_TOKEN
       }
+    }
+  );
+
+  const data = await response.json() as FigmaImageResponse;
+  return data.images;
+};
+
+const findImageNodes = (node: FigmaNode): FigmaNode[] => {
+  const images: FigmaNode[] = [];
+  
+  if (node.type === 'FRAME' || node.type === 'GROUP') {
+    node.children?.forEach(child => {
+      images.push(...findImageNodes(child));
     });
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch Figma file: ${response.statusText}`);
-    }
-
-    return response.json();
-  } catch (error) {
-    console.error('Error fetching Figma file:', error);
-    throw error;
-  }
-}
-
-async function getImageUrls(nodeIds: string[]): Promise<Record<string, string>> {
-  try {
-    const response = await fetch(
-      `https://api.figma.com/v1/images/${FIGMA_FILE_ID}?ids=${nodeIds.join(',')}&format=svg`,
-      {
-        headers: {
-          'X-Figma-Token': FIGMA_ACCESS_TOKEN
-        }
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch image URLs: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    return data.images;
-  } catch (error) {
-    console.error('Error fetching image URLs:', error);
-    throw error;
-  }
-}
-
-async function downloadImage(url: string, filepath: string): Promise<void> {
-  try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`Failed to download image: ${response.statusText}`);
-    }
-
-    const buffer = await response.arrayBuffer();
-    await fs.writeFile(filepath, Buffer.from(buffer));
-  } catch (error) {
-    console.error(`Error downloading image to ${filepath}:`, error);
-    throw error;
-  }
-}
-
-function findImageNodes(node: FigmaNode, images: FigmaNode[] = []): FigmaNode[] {
-  if (node.type === 'COMPONENT' || node.type === 'INSTANCE') {
+  } else if (node.type === 'COMPONENT' || node.type === 'INSTANCE') {
     images.push(node);
   }
-
-  if (node.children) {
-    node.children.forEach(child => findImageNodes(child, images));
-  }
-
+  
   return images;
-}
+};
 
 function sanitizeComponentName(name: string): string {
   return name
@@ -149,6 +131,16 @@ async function ensureDirectoryExists(dir: string): Promise<void> {
   }
 }
 
+async function downloadImage(url: string, filepath: string): Promise<void> {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to download image: ${response.statusText}`);
+  }
+
+  const buffer = await response.arrayBuffer();
+  await fs.writeFile(filepath, Buffer.from(buffer));
+}
+
 async function main() {
   try {
     // Create directories
@@ -160,13 +152,13 @@ async function main() {
     ]);
 
     console.log('Fetching Figma file...');
-    const figmaFile = await getFigmaFile();
+    const figmaFile = await fetchFigmaFile(FIGMA_FILE_ID);
 
     const imageNodes = findImageNodes(figmaFile.document);
     console.log(`Found ${imageNodes.length} image nodes`);
 
     const nodeIds = imageNodes.map(node => node.id);
-    const imageUrls = await getImageUrls(nodeIds);
+    const imageUrls = await fetchFigmaImages(FIGMA_FILE_ID, nodeIds);
 
     for (const node of imageNodes) {
       const imageUrl = imageUrls[node.id];
