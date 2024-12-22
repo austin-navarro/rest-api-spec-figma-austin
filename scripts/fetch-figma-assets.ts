@@ -131,16 +131,6 @@ async function ensureDirectoryExists(dir: string): Promise<void> {
   }
 }
 
-async function downloadImage(url: string, filepath: string): Promise<void> {
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`Failed to download image: ${response.statusText}`);
-  }
-
-  const buffer = await response.arrayBuffer();
-  await fs.writeFile(filepath, Buffer.from(buffer));
-}
-
 async function main() {
   try {
     // Create directories
